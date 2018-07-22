@@ -53,7 +53,7 @@ namespace PhotoViewer {
                 loadingImage = true;
 
                 if (this.InvokeRequired) {
-                    this.Invoke(new MethodInvoker(delegate { loadImage(img); }));
+                    this.Invoke(new MethodInvoker(delegate { loadImage(img, nextPrev, lastImgPos, true); }));
                     return;
                 }
 
