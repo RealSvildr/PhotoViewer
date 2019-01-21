@@ -428,7 +428,8 @@ namespace PhotoViewer {
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e) {
-            image.Visible = false;
+            this.WindowState = FormWindowState.Minimized;
+            this.Hide();
         }
         #endregion
 
