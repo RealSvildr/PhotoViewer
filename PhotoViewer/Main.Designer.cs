@@ -90,7 +90,7 @@
             this.pnl_Image.Location = new System.Drawing.Point(0, 36);
             this.pnl_Image.Margin = new System.Windows.Forms.Padding(0);
             this.pnl_Image.Name = "pnl_Image";
-            this.pnl_Image.Size = new System.Drawing.Size(541, 317);
+            this.pnl_Image.Size = new System.Drawing.Size(541, 318);
             this.pnl_Image.TabIndex = 10;
             this.pnl_Image.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnl_Image_MouseDown);
             this.pnl_Image.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnl_Image_MouseMove);
@@ -202,9 +202,10 @@
             // 
             // tb_zoom
             // 
+            this.tb_zoom.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.tb_zoom.BackColor = System.Drawing.SystemColors.Control;
             this.tb_zoom.LargeChange = 4;
-            this.tb_zoom.Location = new System.Drawing.Point(35, 173);
+            this.tb_zoom.Location = new System.Drawing.Point(35, 174);
             this.tb_zoom.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tb_zoom.Name = "tb_zoom";
             this.tb_zoom.Orientation = System.Windows.Forms.Orientation.Vertical;
@@ -214,15 +215,16 @@
             this.tb_zoom.Visible = false;
             this.tb_zoom.ValueChanged += new System.EventHandler(this.tb_zoom_ValueChanged);
             this.tb_zoom.Leave += new System.EventHandler(this.tb_zoom_Leave);
+            this.tb_zoom.MouseLeave += new System.EventHandler(this.tb_zoom_MouseLeave);
             // 
             // image
             // 
             this.image.ContextMenuStrip = this.contextMenuStrip1;
             this.image.Image = global::PhotoViewer.Properties.Resources._blank;
-            this.image.Location = new System.Drawing.Point(152, 61);
+            this.image.Location = new System.Drawing.Point(152, 62);
             this.image.Margin = new System.Windows.Forms.Padding(0);
             this.image.Name = "image";
-            this.image.Size = new System.Drawing.Size(238, 170);
+            this.image.Size = new System.Drawing.Size(237, 170);
             this.image.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.image.TabIndex = 0;
             this.image.TabStop = false;
@@ -244,20 +246,21 @@
             // panel1
             // 
             this.panel1.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.panel1.BackColor = System.Drawing.Color.Black;
+            this.panel1.BackColor = System.Drawing.Color.Transparent;
             this.panel1.BackgroundImage = global::PhotoViewer.Properties.Resources.bgIcons;
+            this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.panel1.Controls.Add(this.btn_counterClockwise);
             this.panel1.Controls.Add(this.btn_fullscreen);
+            this.panel1.Controls.Add(this.btn_Forward);
             this.panel1.Controls.Add(this.btn_backward);
             this.panel1.Controls.Add(this.btn_Zoom);
-            this.panel1.Controls.Add(this.btn_Forward);
             this.panel1.Controls.Add(this.btn_clockwise);
-            this.panel1.Controls.Add(this.btn_counterClockwise);
             this.panel1.Controls.Add(this.btn_delete);
             this.panel1.Controls.Add(this.btn_normalize);
-            this.panel1.Location = new System.Drawing.Point(71, 357);
+            this.panel1.Location = new System.Drawing.Point(72, 354);
             this.panel1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(407, 45);
+            this.panel1.Size = new System.Drawing.Size(412, 56);
             this.panel1.TabIndex = 11;
             // 
             // btn_fullscreen
@@ -269,10 +272,10 @@
             this.btn_fullscreen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_fullscreen.ForeColor = System.Drawing.Color.Transparent;
             this.btn_fullscreen.Image = global::PhotoViewer.Properties.Resources.iconFullscreen;
-            this.btn_fullscreen.Location = new System.Drawing.Point(178, -2);
+            this.btn_fullscreen.Location = new System.Drawing.Point(178, 2);
             this.btn_fullscreen.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_fullscreen.Name = "btn_fullscreen";
-            this.btn_fullscreen.Size = new System.Drawing.Size(48, 52);
+            this.btn_fullscreen.Size = new System.Drawing.Size(56, 52);
             this.btn_fullscreen.TabIndex = 1;
             this.btn_fullscreen.UseVisualStyleBackColor = false;
             this.btn_fullscreen.Click += new System.EventHandler(this.btn_fullscreen_Click);
@@ -286,7 +289,7 @@
             this.btn_backward.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_backward.ForeColor = System.Drawing.Color.Transparent;
             this.btn_backward.Image = global::PhotoViewer.Properties.Resources.iconBackward;
-            this.btn_backward.Location = new System.Drawing.Point(117, 7);
+            this.btn_backward.Location = new System.Drawing.Point(117, 9);
             this.btn_backward.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_backward.Name = "btn_backward";
             this.btn_backward.Size = new System.Drawing.Size(71, 39);
@@ -303,10 +306,10 @@
             this.btn_Zoom.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_Zoom.ForeColor = System.Drawing.Color.Transparent;
             this.btn_Zoom.Image = global::PhotoViewer.Properties.Resources.iconZoom;
-            this.btn_Zoom.Location = new System.Drawing.Point(13, 11);
+            this.btn_Zoom.Location = new System.Drawing.Point(23, 14);
             this.btn_Zoom.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_Zoom.Name = "btn_Zoom";
-            this.btn_Zoom.Size = new System.Drawing.Size(46, 28);
+            this.btn_Zoom.Size = new System.Drawing.Size(45, 28);
             this.btn_Zoom.TabIndex = 0;
             this.btn_Zoom.UseVisualStyleBackColor = false;
             this.btn_Zoom.Click += new System.EventHandler(this.btn_Zoom_Click);
@@ -320,7 +323,7 @@
             this.btn_Forward.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_Forward.ForeColor = System.Drawing.Color.Transparent;
             this.btn_Forward.Image = global::PhotoViewer.Properties.Resources.iconForward;
-            this.btn_Forward.Location = new System.Drawing.Point(213, 7);
+            this.btn_Forward.Location = new System.Drawing.Point(220, 10);
             this.btn_Forward.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_Forward.Name = "btn_Forward";
             this.btn_Forward.Size = new System.Drawing.Size(77, 39);
@@ -337,7 +340,7 @@
             this.btn_clockwise.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_clockwise.ForeColor = System.Drawing.Color.Transparent;
             this.btn_clockwise.Image = global::PhotoViewer.Properties.Resources.iconClockwise;
-            this.btn_clockwise.Location = new System.Drawing.Point(320, 10);
+            this.btn_clockwise.Location = new System.Drawing.Point(321, 12);
             this.btn_clockwise.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_clockwise.Name = "btn_clockwise";
             this.btn_clockwise.Size = new System.Drawing.Size(35, 31);
@@ -354,7 +357,7 @@
             this.btn_counterClockwise.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_counterClockwise.ForeColor = System.Drawing.Color.Transparent;
             this.btn_counterClockwise.Image = global::PhotoViewer.Properties.Resources.iconCounterClockwise;
-            this.btn_counterClockwise.Location = new System.Drawing.Point(284, 10);
+            this.btn_counterClockwise.Location = new System.Drawing.Point(284, 12);
             this.btn_counterClockwise.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_counterClockwise.Name = "btn_counterClockwise";
             this.btn_counterClockwise.Size = new System.Drawing.Size(35, 31);
@@ -371,7 +374,7 @@
             this.btn_delete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_delete.ForeColor = System.Drawing.Color.Transparent;
             this.btn_delete.Image = global::PhotoViewer.Properties.Resources.iconDelete;
-            this.btn_delete.Location = new System.Drawing.Point(362, 10);
+            this.btn_delete.Location = new System.Drawing.Point(366, 12);
             this.btn_delete.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_delete.Name = "btn_delete";
             this.btn_delete.Size = new System.Drawing.Size(35, 31);
@@ -388,7 +391,7 @@
             this.btn_normalize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_normalize.ForeColor = System.Drawing.Color.Transparent;
             this.btn_normalize.Image = global::PhotoViewer.Properties.Resources.iconNormalize;
-            this.btn_normalize.Location = new System.Drawing.Point(68, 12);
+            this.btn_normalize.Location = new System.Drawing.Point(76, 15);
             this.btn_normalize.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_normalize.Name = "btn_normalize";
             this.btn_normalize.Size = new System.Drawing.Size(35, 28);
@@ -412,7 +415,7 @@
             this.toolStripButton1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Padding = new System.Windows.Forms.Padding(0, 0, 2, 0);
+            this.toolStrip1.Padding = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this.toolStrip1.Size = new System.Drawing.Size(541, 54);
             this.toolStrip1.TabIndex = 9;
             this.toolStrip1.Text = "toolStrip1";
@@ -574,7 +577,7 @@
             this.Controls.Add(this.toolStrip1);
             this.Icon = global::PhotoViewer.Properties.Resources.favicon;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.MinimumSize = new System.Drawing.Size(553, 434);
+            this.MinimumSize = new System.Drawing.Size(553, 432);
             this.Name = "Main";
             this.Text = "Photo Viewer";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;

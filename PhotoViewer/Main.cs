@@ -12,12 +12,17 @@ using static PhotoViewer.Extensions;
 
 namespace PhotoViewer {
     //TODO: Effects on button hover
-    //TODO: Buttons DPI Scaling 
-    //TODO: Suport for WEBP, (Future for WEBM)
     public partial class Main : Form {
         Thread th_checkHash;
+       
+        private List<Img> _imageList = new List<Img>();
+        private List<string> _permittedExtensions = new List<string>();
+        private int _imagePosition = 0;
 
         public Main(string[] dirImage) {
+            this.Font = new System.Drawing.Font(Font.Name, 8.25f * 96f / CreateGraphics().DpiX, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
+            this.AutoScaleMode = AutoScaleMode.None;
+
             InitializeComponent();
             InitializeLayout();
 
@@ -25,16 +30,16 @@ namespace PhotoViewer {
 
             //TEST AREA
             //if (dirImage.Length == 0)
-            //    dirImage = new string[1] { @"E:\1.jpg" };
+            //    dirImage = new string[1] { @"D:\Test\animais_interessantes4.jpg" };
 
             if (dirImage.Length > 0) {
                 generateImageList(dirImage[0]);
-                if (ImageList.Count == 0) {
+                if (_imageList.Count == 0) {
                     errorMessage();
                     return;
                 }
 
-                loadImage(ImageList[ImagePosition]);
+                loadImage();
                 th_checkHash = new Thread(checkImageHash) { IsBackground = true };
                 th_checkHash.Start();
             } else {
@@ -42,105 +47,91 @@ namespace PhotoViewer {
             }
         }
 
-        private List<Img> ImageList = new List<Img>();
-        private List<string> PermittedExtensions = new List<string>();
-        private int ImagePosition = 0;
-        public bool loadingImage = false;
-
         #region Image Functions
-        private void loadImage(Img img, char? nextPrev = null, int? lastImgPos = null, bool ignoreLoading = false) {
-            if (!loadingImage || ignoreLoading) {
-                loadingImage = true;
-
-                if (this.InvokeRequired) {
-                    this.Invoke(new MethodInvoker(delegate { loadImage(img, nextPrev, lastImgPos, true); }));
-                    return;
-                }
-
-                try {
-                    image.unload();
-
-                    if (img == null) {
-                        this.Text = "Photo Viewer";
-                        errorMessage();
-                    } else {
-                        this.Text = img.Name + " - Photo Viewer";
-
-                        image.aLoad(img.FullDir);
-                        image.Visible = true;
-
-                        lbl_message.Text = "";
-                        lbl_message.Visible = false;
-
-                        image.setZoomBase();
-                        image.aReset();
-
-                        image.Refresh();
-                    }
-                } catch (FileNotFoundException) {
-                    string imgDir = ImageList[lastImgPos != null ? lastImgPos.Value : ImagePosition].FullDir;
-                    ImageList.Clear();
-
-                    generateImageList(imgDir);
-
-                    if (nextPrev == 'n') {
-                        ImagePosition = ImagePosition < ImageList.Count - 2 ? ImagePosition + 1 : 0;
-                    } else if (nextPrev == 'p') {
-                        ImagePosition = ImagePosition > 0 ? ImagePosition - 1 : ImageList.Count - 1;
-                    }
-
-                    loadImage(ImageList[ImagePosition], nextPrev, null, true);
-                } catch (Exception) {
-                    errorMessage();
-                }
-
-                loadingImage = false;
+        /// <summary>
+        /// n == Next
+        /// p == Previous
+        /// d == Delete
+        /// e == Error
+        /// </summary>
+        /// <param name="cCommand"></param>
+        private void loadImage(char? cCommand = null) {
+            testHarsh = false;
+            if (this.InvokeRequired) {
+                this.Invoke(new MethodInvoker(delegate { loadImage(cCommand); })); //, true)
+                return;
             }
+
+            try {
+                if (cCommand != null) {
+                    switch (cCommand) {
+                        case 'n':
+                            _imagePosition++;
+
+                            if (_imagePosition > _imageList.Count - 1) {
+                                _imagePosition = 0;
+                            }
+                            break;
+                        case 'p':
+                            _imagePosition--;
+
+                            if (_imagePosition < 0) {
+                                _imagePosition = _imageList.Count - 1;
+                            }
+                            break;
+                        case 'd':
+                            _imageList.RemoveAt(_imagePosition);
+
+                            if (_imagePosition > _imageList.Count - 1) {
+                                _imagePosition--;
+                            }
+                            break;
+                    }
+                }
+
+
+                image.unload();
+
+                if (_imageList.Count == 0 || cCommand == 'e') {
+                    this.Text = "Photo Viewer";
+                    errorMessage();
+                } else {
+                    this.Text = _imageList[_imagePosition].Name + " - Photo Viewer";
+
+                    image.aLoad(_imageList[_imagePosition].FullDir);
+                    image.Visible = true;
+
+                    lbl_message.Text = "";
+                    lbl_message.Visible = false;
+
+                    image.setZoomBase();
+                    image.aReset();
+
+                    image.Refresh();
+                }
+            } catch (Exception) {
+                errorMessage();
+            }
+
+            testHarsh = true;
         }
         private void forward() {
-            int tempImgPos = ImagePosition; 
-
-            if (ImageList.Count < 2)
+            if (_imageList.Count < 2)
                 return;
 
-            ImagePosition++;
-
-            if (ImagePosition > ImageList.Count - 1) {
-                ImagePosition = 0;
-            }
-
-            loadImage(ImageList[ImagePosition], 'n', tempImgPos);
+            loadImage('n');
             Thread.Sleep(50);
         }
         private void backward() {
-            int tempImgPos = ImagePosition;
-
-            if (ImageList.Count < 2)
+            if (_imageList.Count < 2)
                 return;
 
-            ImagePosition--;
-
-            if (ImagePosition < 0) {
-                ImagePosition = ImageList.Count - 1;
-            }
-
-            loadImage(ImageList[ImagePosition], 'p', tempImgPos);
+            loadImage('p');
             Thread.Sleep(50);
         }
         private void delete() {
-            string imgDir = ImageList[ImagePosition].FullDir;
-
-            ImageList.RemoveAt(ImagePosition);
-
-            if (ImageList.Count == 0) {
-                loadImage(null);
-            } else {
-                if (ImagePosition > ImageList.Count - 1) {
-                    ImagePosition--;
-                }
-
-                loadImage(ImageList[ImagePosition]);
-            }
+            string imgDir = _imageList[_imagePosition].FullDir;
+            loadImage('d');
 
             FileSystem.DeleteFile(
                 imgDir,
@@ -150,8 +141,8 @@ namespace PhotoViewer {
         }
 
         private void fullscreen() {
-            if (ImageList.Count > 0) {
-                using (Fullscreen fs = new Fullscreen(new object[] { ImageList, ImagePosition })) {
+            if (_imageList.Count > 0) {
+                using (Fullscreen fs = new Fullscreen(new object[] { _imageList, _imagePosition })) {
                     Hide();
                     th_checkHash.Abort();
                     fs.ShowDialog();
@@ -162,8 +153,8 @@ namespace PhotoViewer {
                     image.Focus();
 
                     if (fs.currentImage != null) {
-                        ImagePosition = ImageList.IndexOf(fs.currentImage);
-                        loadImage(ImageList[ImagePosition]);
+                        _imagePosition = _imageList.IndexOf(fs.currentImage);
+                        loadImage();
                     }
 
                     th_checkHash = new Thread(checkImageHash);
@@ -174,7 +165,7 @@ namespace PhotoViewer {
         }
 
         private void generatePermittedExtensions() {
-            PermittedExtensions.AddRange(new List<string> { "jpg", "png", "gif", "jpeg", "bmp", "jpe", "ico", "tif", "tiff", "jfif" });
+            _permittedExtensions.AddRange(new List<string> { "jpg", "png", "gif", "jpeg", "bmp", "jpe", "ico", "tif", "tiff", "jfif", "webp" });
         }
         private void generateImageList(string dirImage) {
             FileInfo fileInfo = new FileInfo(dirImage);
@@ -182,8 +173,8 @@ namespace PhotoViewer {
             DirectoryInfo dirInfo = new DirectoryInfo(fileInfo.DirectoryName);
 
             foreach (var file in dirInfo.GetFiles()) {
-                if (file.FullName == dirImage || PermittedExtensions.Contains(file.Extension.Trim('.').ToLower())) {
-                    ImageList.Add(new Img() {
+                if (file.FullName == dirImage || _permittedExtensions.Contains(file.Extension.Trim('.').ToLower())) {
+                    _imageList.Add(new Img() {
                         Name = file.Name.Substring(0, file.Name.Length - file.Extension.Length),
                         Dir = file.Directory.FullName,
                         FullDir = file.FullName
@@ -191,8 +182,8 @@ namespace PhotoViewer {
                 }
             }
 
-            ImageList = ImageList.NumericalSort();
-            ImagePosition = ImageList.IndexOf(ImageList.Where(p => p.FullDir == dirImage).FirstOrDefault());
+            _imageList = _imageList.NumericalSort();
+            _imagePosition = _imageList.IndexOf(_imageList.Where(p => p.FullDir == dirImage).FirstOrDefault());
         }
 
         private void errorMessage() {
@@ -208,10 +199,10 @@ namespace PhotoViewer {
             lbl_message.Visible = true;
 
             lbl_message.Text = message;
-            messageReposition(true);
+            messageReposition();
         }
-        private void messageReposition(bool force = false) {
-            if (lbl_message.Visible || force) {
+        private void messageReposition() {
+            if (lbl_message.Visible) {
                 lbl_message.MaximumSize = pnl_Image.Size;
 
                 int distWidth = pnl_Image.Width - lbl_message.Width;
@@ -246,6 +237,9 @@ namespace PhotoViewer {
             tb_zoom.Visible = true;
         }
         private void tb_zoom_Leave(object sender, EventArgs e) {
+            tb_zoom.Visible = false;
+        }
+        private void tb_zoom_MouseLeave(object sender, EventArgs e) {
             tb_zoom.Visible = false;
         }
         private void tb_zoom_ValueChanged(object sender, EventArgs e) {
@@ -302,14 +296,14 @@ namespace PhotoViewer {
         }
 
         private void editToolStripMenuItem_Click(object sender, EventArgs e) {
-            Img img = ImageList[ImagePosition];
+            Img img = _imageList[_imagePosition];
             Process.Start("mspaint", "\"" + img.FullDir + "\"");
         }
         private void setAsDesktopToolStripMenuItem_Click(object sender, EventArgs e) {
             //TODO
         }
         private void openFileLocationToolStripMenuItem_Click(object sender, EventArgs e) {
-            Img img = ImageList[ImagePosition];
+            Img img = _imageList[_imagePosition];
             Process.Start(img.Dir);
         }
         private void rotateRightToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -394,8 +388,6 @@ namespace PhotoViewer {
         #endregion
 
         #region Layout
-        private const int bottom = 56; // 200% -> 50
-
         private void InitializeLayout() {
             glassBorder();
             hideTopBar();
@@ -413,9 +405,10 @@ namespace PhotoViewer {
         public static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarginset);
 
         private void glassBorder() {
-            MARGINS margin = new MARGINS();
-            margin.top = 0;
-            margin.bot = bottom;
+            MARGINS margin = new MARGINS {
+                top = 0,
+                bot = 52
+            };
             //panel1.Height = bottom;
 
             DwmExtendFrameIntoClientArea(this.Handle, ref margin);
@@ -424,7 +417,7 @@ namespace PhotoViewer {
         private void hideTopBar() {
             toolStrip1.Hide();
             pnl_Image.Location = new Point(0, 0);
-            pnl_Image.Height = this.Height - (40 + bottom);
+            pnl_Image.Height = this.Height - (92);
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e) {
@@ -432,23 +425,27 @@ namespace PhotoViewer {
             this.Hide();
         }
         #endregion
-
+        
         private void checkImageHash() {
             while (true) {
-                if (ImageList.Count == 0) {
-                    errorMessage();
-                    break;
-                }
+                if (testHarsh) {
+                    if (_imageList.Count == 0) {
+                        errorMessage();
+                        break;
+                    }
+                    
 
-                string hash = getFileHash(ImageList[ImagePosition].FullDir);
+                    string hash = getFileHash(_imageList[_imagePosition].FullDir);
 
-                if (hash != null && hash != actualHash) {
-                    loadImage(ImageList[ImagePosition]);
+                    if (hash != null && hash != actualHash) {
+                        loadImage();
+                    }
                 }
 
                 Thread.Sleep(1000);
             }
         }
+
     }
 
     public class Img {

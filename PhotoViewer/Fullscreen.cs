@@ -34,9 +34,9 @@ namespace PhotoViewer {
         private decimal Zoom = 1;
 
         #region Image Functions
-        private void loadImage(Img img) {
+        private void loadImage() {
             if (this.InvokeRequired) {
-                this.Invoke(new MethodInvoker(delegate { loadImage(img); }));
+                this.Invoke(new MethodInvoker(delegate { loadImage(); }));
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace PhotoViewer {
 
             try {
                 image.unload();
-                image.aLoad(img.FullDir);
+                image.aLoad(ImageList[ImagePosition].FullDir);
 
                 imageResize();
 
@@ -66,7 +66,7 @@ namespace PhotoViewer {
             }
 
             jumpOne = true;
-            loadImage(ImageList[ImagePosition]);
+            loadImage();
         }
         private void backward() {
             if (ImageList.Count < 2)
@@ -75,12 +75,12 @@ namespace PhotoViewer {
             ImagePosition = ImagePosition == 0 ? ImageList.Count - 1 : ImagePosition - 1;
 
             jumpOne = true;
-            loadImage(ImageList[ImagePosition]);
+            loadImage();
         }
 
         private void execution() {
             Thread.Sleep(100);
-            loadImage(ImageList[ImagePosition]);
+            loadImage();
 
             while (true) {
                 Thread.Sleep((int)threadTimer);

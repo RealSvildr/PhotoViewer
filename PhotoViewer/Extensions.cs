@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 
@@ -12,19 +14,34 @@ namespace PhotoViewer {
         public static decimal baseZoom { get; private set; }
         public static readonly decimal maxZoom = 16;
 
+        internal static string actualHash;
+        internal static bool testHarsh = true;
+
         private static Point mousePosition;
         private static bool defaultZoom = true;
-        internal static string actualHash;
+
 
         public static void aLoad(this PictureBox image, string path) {
             string ext = path.Split('.').Last().ToLower();
 
             actualHash = getFileHash(path);
             MemoryStream mS = new MemoryStream();
-            using (Image i = Image.FromFile(path)) {
-                i.Save(mS, i.RawFormat); //imgFormat
+
+            if (ext == "webp") {
+                //Try to load as WEBP
+                using (Image i = WebPFromFile(path)) {
+                    i.Save(mS, ImageFormat.Png); //imgFormat
+                }
+            } else {
+                //Try Opening in a normal Mode
+                using (Image i = Image.FromFile(path)) {
+                    i.Save(mS, i.RawFormat); //imgFormat
+                }
             }
+
             image.Image = Image.FromStream(mS);
+
+
         }
         public static void aResize(this PictureBox image) {
             Control panel = image.Parent;
@@ -217,6 +234,8 @@ namespace PhotoViewer {
             return str;
         }
 
+
+
         #region Numerical Sort
         public static List<Img> NumericalSort(this IEnumerable<Img> listString) {
             IEnumerable<sString> sortedList = listString.Select(p => new sString() { originFile = p, sortName = nameSort(p.Name) });
@@ -261,5 +280,64 @@ namespace PhotoViewer {
         }
         #endregion
 
+
+        #region WebP
+        [DllImport("libwebp.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "WebPGetInfo")]
+        public static extern int WebPGetInfo(IntPtr data, uint dataSize, out int width, out int height);
+
+        [DllImport("libwebp.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "WebPDecodeBGRAInto")]
+        public static extern IntPtr WebPDecodeBGRAInto(IntPtr data, uint dataSize, IntPtr outputBuffer, int outputBufferSize, int outputStride);
+
+        internal static Image WebPFromFile(string path) {
+            byte[] bytes;
+
+            using (Stream st = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+                bytes = new byte[st.Length];
+                st.Read(bytes, 0, bytes.Length);
+            }
+
+            return WebPDecode(bytes);
+        }
+
+        private static Bitmap WebPDecode(byte[] webpData) {
+            // Get the image width and height
+            var pinnedWebP = GCHandle.Alloc(webpData, GCHandleType.Pinned);
+            IntPtr ptrData = pinnedWebP.AddrOfPinnedObject();
+            uint dataSize = (uint)webpData.Length;
+
+            Bitmap bitmap = null;
+            BitmapData bitmapData = null;
+            IntPtr outputBuffer = IntPtr.Zero;
+
+            if (WebPGetInfo(ptrData, dataSize, out int width, out int height) != 1) {
+                throw new Exception("WebP image header is corrupted.");
+            }
+
+            try {
+                // Create a BitmapData and Lock all pixels to be written
+                bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+                bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, bitmap.PixelFormat);
+
+                // Allocate memory for uncompress image
+                int outputBufferSize = bitmapData.Stride * height;
+                outputBuffer = Marshal.AllocHGlobal(outputBufferSize);
+                outputBuffer = WebPDecodeBGRAInto(ptrData, dataSize, outputBuffer, outputBufferSize, bitmapData.Stride);
+
+                // Write image to bitmap using Marshal
+                byte[] buffer = new byte[outputBufferSize];
+                Marshal.Copy(outputBuffer, buffer, 0, outputBufferSize);
+                Marshal.Copy(buffer, 0, bitmapData.Scan0, outputBufferSize);
+            } finally {
+                // Unlock the pixels
+                bitmap?.UnlockBits(bitmapData);
+
+                // Free memory
+                pinnedWebP.Free();
+                Marshal.FreeHGlobal(outputBuffer);
+            }
+
+            return bitmap;
+        }
+        #endregion
     }
 }
