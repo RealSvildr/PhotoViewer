@@ -1,9 +1,13 @@
 # PhotoViewer Ver. 0.55b
 
 
-Compiled File: https://github.com/RealSvildr/PhotoViewer/blob/master/Photo%20Viewer.exe
+Compiled File: https://github.com/RealSvildr/PhotoViewer/blob/master/PhotoViewer.rar
 
 LOG
+ * 0.6
+   * Button DPI Scaling
+   * Support WEBP and WEBM
+   * Rework in the ImageLoad function
  * 0.55b
    * When a file is not found on folder, re-load images
    
@@ -19,6 +23,4 @@ LOG
 TODO List
  * Better button images
  * Shadow on button hover
- * Button DPI Scaling
- * Support WEBP and WEBM
  * Pre-load next images on memory to speed-up the load.
