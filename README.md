@@ -1,4 +1,4 @@
-# PhotoViewer Ver. 0.55b
+# PhotoViewer Ver. 0.6
 
 
 Compiled File: https://github.com/RealSvildr/PhotoViewer/blob/master/PhotoViewer.rar
