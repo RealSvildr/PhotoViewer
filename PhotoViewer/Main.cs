@@ -89,7 +89,6 @@ namespace PhotoViewer {
                     }
                 }
 
-
                 image.unload();
 
                 if (_imageList.Count == 0 || cCommand == 'e') {
@@ -109,6 +108,13 @@ namespace PhotoViewer {
 
                     image.Refresh();
                 }
+            } catch (FileNotFoundException) {
+                string imgDir = _imageList[_imagePosition].FullDir;
+                _imageList.Clear();
+                generateImageList(imgDir);
+
+                loadImage(cCommand);
+                return;
             } catch (Exception) {
                 errorMessage();
             }
