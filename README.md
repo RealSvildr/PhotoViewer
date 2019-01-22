@@ -6,7 +6,7 @@ Compiled File: https://github.com/RealSvildr/PhotoViewer/blob/master/PhotoViewer
 LOG
  * 0.6
    * Button DPI Scaling
-   * Support WEBP and WEBM
+   * Support WEBP
    * Rework in the ImageLoad function
  * 0.55b
    * When a file is not found on folder, re-load images
@@ -24,3 +24,4 @@ TODO List
  * Better button images
  * Shadow on button hover
  * Pre-load next images on memory to speed-up the load.
+ * Support Webm
