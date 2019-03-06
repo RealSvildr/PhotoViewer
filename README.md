@@ -4,6 +4,8 @@
 Compiled File: https://github.com/RealSvildr/PhotoViewer/blob/master/PhotoViewer.rar
 
 LOG
+ * 0.6b
+   * Read the file header to check if the file is webp (some webp images had jpg extension).
  * 0.6
    * Button DPI Scaling
    * Support WEBP
