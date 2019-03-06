@@ -20,28 +20,32 @@ namespace PhotoViewer {
         private static Point mousePosition;
         private static bool defaultZoom = true;
 
-
         public static void aLoad(this PictureBox image, string path) {
             string ext = path.Split('.').Last().ToLower();
 
             actualHash = getFileHash(path);
             MemoryStream mS = new MemoryStream();
 
-            if (ext == "webp") {
-                //Try to load as WEBP
+            string fileHeader = "";
+            using (Stream r = new FileStream(path, FileMode.Open)) {
+                for (int i = 0; i < 16; i++) {
+                    fileHeader += ((char)r.ReadByte()).ToString();
+                }
+            }
+
+            if (fileHeader.Contains("WEBP")) {
+                //Load WebP images
                 using (Image i = WebPFromFile(path)) {
                     i.Save(mS, ImageFormat.Png); //imgFormat
                 }
             } else {
-                //Try Opening in a normal Mode
+                //Load common images e.g. jpg, png, gif...
                 using (Image i = Image.FromFile(path)) {
                     i.Save(mS, i.RawFormat); //imgFormat
                 }
             }
 
             image.Image = Image.FromStream(mS);
-
-
         }
         public static void aResize(this PictureBox image) {
             Control panel = image.Parent;
