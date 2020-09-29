@@ -13,8 +13,8 @@ using static PhotoViewer.Extensions;
 namespace PhotoViewer {
     //TODO: Effects on button hover
     public partial class Main : Form {
-        Thread th_checkHash;
-       
+        private Thread th_checkHash;
+
         private List<Img> _imageList = new List<Img>();
         private List<string> _permittedExtensions = new List<string>();
         private int _imagePosition = 0;
@@ -29,8 +29,8 @@ namespace PhotoViewer {
             generatePermittedExtensions();
 
             //TEST AREA
-            //if (dirImage.Length == 0)
-            //    dirImage = new string[1] { @"D:\Test\animais_interessantes4.jpg" };
+            if (dirImage.Length == 0)
+                dirImage = new string[1] { @"D:\Data\Images\test.png" };
 
             if (dirImage.Length > 0) {
                 generateImageList(dirImage[0]);
@@ -121,19 +121,23 @@ namespace PhotoViewer {
 
             testHarsh = true;
         }
-        private void forward() {
+        private void forward(int sleepTimer = 50) {
             if (_imageList.Count < 2)
                 return;
 
             loadImage('n');
-            Thread.Sleep(50);
+
+            if (sleepTimer > 0)
+                Thread.Sleep(sleepTimer);
         }
-        private void backward() {
+        private void backward(int sleepTimer = 50) {
             if (_imageList.Count < 2)
                 return;
 
             loadImage('p');
-            Thread.Sleep(50);
+
+            if (sleepTimer > 0)
+                Thread.Sleep(sleepTimer);
         }
         private void delete() {
             string imgDir = _imageList[_imagePosition].FullDir;
@@ -182,7 +186,7 @@ namespace PhotoViewer {
                 if (file.FullName == dirImage || _permittedExtensions.Contains(file.Extension.Trim('.').ToLower())) {
                     _imageList.Add(new Img() {
                         Name = file.Name.Substring(0, file.Name.Length - file.Extension.Length),
-                        Dir = file.Directory.FullName,
+                        Dir = file.FullName,
                         FullDir = file.FullName
                     });
                 }
@@ -358,35 +362,27 @@ namespace PhotoViewer {
 
         #region Keyboard
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData) {
+            var hasCtrl = keyData.AnyKey(Keys.Control);
+            var hasShift = keyData.AnyKey(Keys.Shift);
 
-            switch (keyData) {
-                case Keys.Oemplus:
-                case Keys.Add:
-                    image.aZoom((decimal)0.1 * zoom);
-                    break;
-                case Keys.OemMinus:
-                case Keys.Subtract:
-                    image.aZoom(-(decimal)0.1 * zoom);
-                    break;
-                case Keys.Up:
-                    image.aZoom(baseZoom - zoom);
-                    break;
-                case Keys.Left:
-                    backward();
-                    break;
-                case Keys.Right:
-                    forward();
-                    break;
-                case Keys.Delete:
-                    delete();
-                    break;
-                case Keys.F11:
-                    fullscreen();
-                    break;
-                case Keys.Escape:
-                    tb_zoom.Visible = false;
-                    break;
-            }
+            var sleepTimer = hasCtrl ? 0 : hasShift ? 100 : 50;
+
+            if (keyData.AnyKey(Keys.Oemplus, Keys.Add))
+                image.aZoom((decimal)0.1 * zoom);
+            else if (keyData.AnyKey(Keys.OemMinus, Keys.Subtract))
+                image.aZoom(-(decimal)0.1 * zoom);
+            else if (keyData.AnyKey(Keys.Up))
+                image.aZoom(baseZoom - zoom);
+            else if (keyData.AnyKey(Keys.Left))
+                backward(sleepTimer);
+            else if (keyData.AnyKey(Keys.Right))
+                forward(sleepTimer);
+            else if (keyData.AnyKey(Keys.Delete))
+                delete();
+            else if (keyData.AnyKey(Keys.F11))
+                fullscreen();
+            else if (keyData.AnyKey(Keys.Escape))
+                tb_zoom.Visible = false;
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
@@ -431,7 +427,7 @@ namespace PhotoViewer {
             this.Hide();
         }
         #endregion
-        
+
         private void checkImageHash() {
             while (true) {
                 if (testHarsh) {
@@ -439,7 +435,7 @@ namespace PhotoViewer {
                         errorMessage();
                         break;
                     }
-                    
+
 
                     string hash = getFileHash(_imageList[_imagePosition].FullDir);
 

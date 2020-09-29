@@ -238,7 +238,25 @@ namespace PhotoViewer {
             return str;
         }
 
+        internal static bool AnyKey(this Keys value, params Keys[] keyArray) {
+            var keyList = value.ToString().Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
 
+            foreach (var key in keyArray)
+                if (keyList.Contains(key.ToString()))
+                    return true;
+
+            return false;
+        }
+        internal static bool ContainsKeys(this Keys value, params Keys[] keyArray) {
+            var keyList = value.ToString().Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+            int qnt = 0;
+
+            foreach (var key in keyArray)
+                if (keyList.Contains(key.ToString()))
+                    qnt++;
+
+            return keyArray.Length == qnt;
+        }
 
         #region Numerical Sort
         public static List<Img> NumericalSort(this IEnumerable<Img> listString) {
