@@ -27,7 +27,7 @@ namespace PhotoViewer {
             MemoryStream mS = new MemoryStream();
 
             string fileHeader = "";
-            using (Stream r = new FileStream(path, FileMode.Open)) {
+            using (Stream r = new FileStream(path, FileMode.Open, FileAccess.Read)) {
                 for (int i = 0; i < 16; i++) {
                     fileHeader += ((char)r.ReadByte()).ToString();
                 }
